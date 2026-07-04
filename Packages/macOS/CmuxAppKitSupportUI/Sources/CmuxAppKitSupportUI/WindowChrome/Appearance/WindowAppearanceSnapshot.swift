@@ -26,6 +26,10 @@ public struct WindowAppearanceSnapshot {
     /// Resolved window glass settings.
     public let windowGlassSettings: WindowGlassSettingsSnapshot
 
+    /// Compiled Metal shader source path for the animated window backdrop,
+    /// or `nil` for the flat terminal-colored backdrop.
+    public let backdropShaderPath: String?
+
     /// Creates a resolved window appearance snapshot.
     public init(
         terminalBackgroundColor: NSColor,
@@ -34,7 +38,8 @@ public struct WindowAppearanceSnapshot {
         terminalRenderingMode: GhosttyTerminalBackdropRenderingMode,
         unifySurfaceBackdrops: Bool,
         sidebarSettings: SidebarBackdropSettingsSnapshot,
-        windowGlassSettings: WindowGlassSettingsSnapshot
+        windowGlassSettings: WindowGlassSettingsSnapshot,
+        backdropShaderPath: String? = nil
     ) {
         self.terminalBackgroundColor = terminalBackgroundColor
         self.terminalBackgroundOpacity = terminalBackgroundOpacity
@@ -43,6 +48,7 @@ public struct WindowAppearanceSnapshot {
         self.unifySurfaceBackdrops = unifySurfaceBackdrops
         self.sidebarSettings = sidebarSettings
         self.windowGlassSettings = windowGlassSettings
+        self.backdropShaderPath = backdropShaderPath
     }
 
     /// Clamps opacity into the visible `0...1` range.
@@ -102,10 +108,23 @@ public struct WindowAppearanceSnapshot {
         }
     }
 
+    /// Whether an animated shader backdrop is configured.
+    public var usesShaderBackdrop: Bool {
+        guard let backdropShaderPath else { return false }
+        return !backdropShaderPath.isEmpty
+    }
+
     /// Returns the root terminal backdrop policy.
     public func terminalBackdropPolicy() -> WindowBackdropPolicy {
         if terminalBackgroundBlur.isMacOSGlassStyle {
             return .clear
+        }
+        if let backdropShaderPath, !backdropShaderPath.isEmpty {
+            return .shaderBackdrop(
+                shaderPath: backdropShaderPath,
+                color: terminalBackgroundColor,
+                opacity: terminalBackgroundOpacity
+            )
         }
         return .ghosttyTerminalBackdrop(
             color: terminalBackgroundColor,
@@ -148,14 +167,17 @@ public struct WindowAppearanceSnapshot {
             )
         }
 
-        if terminalBackgroundOpacity < 0.999 {
+        // A shader backdrop renders inside the hosting view, so the window
+        // itself must stay transparent for the shader to be what's visible.
+        if terminalBackgroundOpacity < 0.999 || usesShaderBackdrop {
             return WindowBackdropPlan(
                 hostingPhase: .transparentRootBackdrop,
                 windowBackgroundColor: windowBackgroundPolicy.transparentWindowBaseColor,
                 windowIsOpaque: false,
                 rootPolicy: rootPolicy,
                 glass: nil,
-                shouldApplyGhosttyCompositorBlur: !terminalBackgroundBlur.isMacOSGlassStyle
+                shouldApplyGhosttyCompositorBlur: terminalBackgroundOpacity < 0.999 &&
+                    !terminalBackgroundBlur.isMacOSGlassStyle
             )
         }
 

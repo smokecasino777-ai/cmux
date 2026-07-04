@@ -1919,6 +1919,8 @@ struct ContentView: View {
     @AppStorage("bgGlassTintHex") private var bgGlassTintHex = "#000000"
     @AppStorage("bgGlassTintOpacity") private var bgGlassTintOpacity = 0.03
     @AppStorage("bgGlassEnabled") private var bgGlassEnabled = false
+    // Animated window backdrop shader (compiled MSL path; empty = disabled)
+    @AppStorage("backdropShaderPath") private var backdropShaderPath: String?
     @State private var titlebarLeadingInset: CGFloat = 12
     private var windowIdentifier: String { "cmux.main.\(windowId.uuidString)" }
     private var windowAppearanceSnapshot: WindowAppearanceSnapshot {
@@ -1938,7 +1940,8 @@ struct ContentView: View {
                 sidebarBlurOpacity: sidebarBlurOpacity,
                 bgGlassEnabled: bgGlassEnabled,
                 bgGlassTintHex: bgGlassTintHex,
-                bgGlassTintOpacity: bgGlassTintOpacity
+                bgGlassTintOpacity: bgGlassTintOpacity,
+                backdropShaderPath: backdropShaderPath
             )
         )
     }

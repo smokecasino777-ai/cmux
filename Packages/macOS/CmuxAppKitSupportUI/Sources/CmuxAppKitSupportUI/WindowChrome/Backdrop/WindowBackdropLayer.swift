@@ -48,6 +48,18 @@ public struct WindowBackdropLayer: View {
                     Color(nsColor: materialPolicy.tintColor)
                 }
             }
+        case let .shaderBackdrop(shaderPath, color, opacity):
+            switch role {
+            case .windowRoot:
+                // Flat backdrop color underneath so a shader that fails to
+                // load, or hasn't produced a frame yet, degrades gracefully.
+                ZStack {
+                    Color(nsColor: color.withAlphaComponent(opacity))
+                    ShaderBackdropView(shaderPath: shaderPath, baseColor: color, opacity: opacity)
+                }
+            case .terminalCanvas, .bonsplitChrome, .titlebar, .leftSidebar, .rightSidebar, .browserSurface:
+                LayerBackedBackdropColor(color: color.withAlphaComponent(opacity))
+            }
         case .clear:
             Color.clear
         }

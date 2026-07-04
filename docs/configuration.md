@@ -171,3 +171,35 @@ Default: `unified`.
 ```
 
 The toolbar layout toggle persists the last user choice for future generated diff viewers. Passing `cmux diff --layout split` or `cmux diff --layout unified` overrides both the saved toolbar choice and this default for that invocation.
+
+## `backdrop.shaderPath`
+
+Renders an animated Metal shader as the window backdrop — behind the sidebar,
+tab bar, and terminal panes (which are transparent over the window root
+backdrop by default). Combine with `sidebarAppearance.matchTerminalBackground`
+so the sidebar is fully transparent over the shader.
+
+```json
+{
+  "backdrop": {
+    "shaderPath": "~/.config/cmux/backdrops/sakura-petals.metal"
+  }
+}
+```
+
+The file is Metal Shading Language compiled from a Shadertoy-style GLSL
+shader (the same format as Ghostty's `custom-shader`). Compile one with:
+
+```bash
+scripts/compile-backdrop-shader.sh ~/path/to/shader.glsl
+```
+
+Notes:
+
+- The shader's `iChannel0` samples a solid texture holding the terminal
+  background color, so background-reactive shaders blend over the theme.
+- Set `shaderPath` to `""` or `null` to disable.
+- The display link pauses while the window is occluded, and Reduce Motion
+  renders a single static frame.
+- A shader that fails to compile is ignored and logged
+  (`com.cmux.shader-backdrop` subsystem); the flat backdrop color remains.

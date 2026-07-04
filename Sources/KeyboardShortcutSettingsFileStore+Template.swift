@@ -166,6 +166,11 @@ extension CmuxSettingsFileStore {
                 ],
             ],
             [
+                "backdrop": [
+                    "shaderPath": "",
+                ],
+            ],
+            [
                 "automation": [
                     "socketControlMode": SocketControlSettings.defaultMode.rawValue,
                     "socketPassword": "",

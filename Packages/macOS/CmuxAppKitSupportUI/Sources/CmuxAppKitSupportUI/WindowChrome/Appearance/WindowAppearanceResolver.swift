@@ -42,7 +42,8 @@ public struct WindowAppearanceResolver {
                 terminalGlassTintColor: terminalAppearance.backgroundColor.withAlphaComponent(
                     WindowAppearanceSnapshot.clampedOpacity(terminalAppearance.backgroundOpacity)
                 )
-            )
+            ),
+            backdropShaderPath: settings.backdropShaderPath.flatMap { $0.isEmpty ? nil : $0 }
         )
     }
 
@@ -66,7 +67,8 @@ public struct WindowAppearanceResolver {
             sidebarBlurOpacity: defaults.object(forKey: "sidebarBlurOpacity") as? Double ?? 1.0,
             bgGlassEnabled: defaults.object(forKey: "bgGlassEnabled") as? Bool ?? false,
             bgGlassTintHex: defaults.string(forKey: "bgGlassTintHex") ?? "#000000",
-            bgGlassTintOpacity: defaults.object(forKey: "bgGlassTintOpacity") as? Double ?? 0.03
+            bgGlassTintOpacity: defaults.object(forKey: "bgGlassTintOpacity") as? Double ?? 0.03,
+            backdropShaderPath: defaults.string(forKey: "backdropShaderPath")
         ))
     }
 }

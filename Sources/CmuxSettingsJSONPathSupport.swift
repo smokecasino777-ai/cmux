@@ -424,6 +424,7 @@ extension CmuxSettingsFileStore {
         "sidebarAppearance.lightModeTintColor",
         "sidebarAppearance.darkModeTintColor",
         "sidebarAppearance.tintOpacity",
+        "backdrop.shaderPath",
         "automation.socketControlMode",
         "automation.socketPassword",
         "automation.claudeCodeIntegration",

@@ -44,6 +44,9 @@ public struct WindowAppearanceUserSettingsSnapshot {
     /// Background glass tint opacity.
     public let bgGlassTintOpacity: Double
 
+    /// Compiled Metal shader source path for the animated window backdrop.
+    public let backdropShaderPath: String?
+
     /// Creates a user settings snapshot for window appearance.
     public init(
         unifySurfaceBackdrops: Bool,
@@ -59,7 +62,8 @@ public struct WindowAppearanceUserSettingsSnapshot {
         sidebarBlurOpacity: Double,
         bgGlassEnabled: Bool,
         bgGlassTintHex: String,
-        bgGlassTintOpacity: Double
+        bgGlassTintOpacity: Double,
+        backdropShaderPath: String? = nil
     ) {
         self.unifySurfaceBackdrops = unifySurfaceBackdrops
         self.colorScheme = colorScheme
@@ -75,5 +79,6 @@ public struct WindowAppearanceUserSettingsSnapshot {
         self.bgGlassEnabled = bgGlassEnabled
         self.bgGlassTintHex = bgGlassTintHex
         self.bgGlassTintOpacity = bgGlassTintOpacity
+        self.backdropShaderPath = backdropShaderPath
     }
 }

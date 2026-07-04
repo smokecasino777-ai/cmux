@@ -13,6 +13,9 @@ public enum WindowBackdropPolicy {
     /// A sidebar AppKit material or tint policy.
     case sidebarMaterial(SidebarBackdropMaterialPolicy)
 
+    /// An animated Metal shader over the terminal backdrop color.
+    case shaderBackdrop(shaderPath: String, color: NSColor, opacity: CGFloat)
+
     /// A fully clear surface.
     case clear
 
@@ -22,7 +25,7 @@ public enum WindowBackdropPolicy {
         case let .ghosttyTerminalBackdrop(color, opacity, renderingMode):
             guard renderingMode.usesWindowHostBackdrop else { return nil }
             return color.withAlphaComponent(opacity)
-        case .sidebarMaterial, .clear:
+        case .sidebarMaterial, .shaderBackdrop, .clear:
             return nil
         }
     }
@@ -47,6 +50,13 @@ public enum WindowBackdropPolicy {
                 String(format: "%.4f", Double(materialPolicy.cornerRadius)),
                 String(materialPolicy.preferLiquidGlass),
                 String(materialPolicy.usesWindowLevelGlass),
+            ].joined(separator: ":")
+        case let .shaderBackdrop(shaderPath, color, opacity):
+            return [
+                "shaderBackdrop",
+                shaderPath,
+                color.hexString(includeAlpha: true),
+                String(format: "%.4f", Double(opacity)),
             ].joined(separator: ":")
         case .clear:
             return "clear"

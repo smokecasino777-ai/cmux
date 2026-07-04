@@ -371,6 +371,9 @@ final class CmuxSettingsFileStore {
         if let sidebarAppearanceSection = root["sidebarAppearance"] as? [String: Any] {
             parseSidebarAppearanceSection(sidebarAppearanceSection, sourcePath: sourcePath, snapshot: &snapshot)
         }
+        if let backdropSection = root["backdrop"] as? [String: Any] {
+            parseBackdropSection(backdropSection, sourcePath: sourcePath, snapshot: &snapshot)
+        }
         if let automationSection = root["automation"] as? [String: Any] {
             parseAutomationSection(automationSection, sourcePath: sourcePath, snapshot: &snapshot)
         }
@@ -860,6 +863,22 @@ final class CmuxSettingsFileStore {
         if let value = jsonDouble(section["tintOpacity"]) {
             let clamped = min(max(value, 0), 1)
             snapshot.managedUserDefaults["sidebarTintOpacity"] = .double(clamped)
+        }
+    }
+
+    private func parseBackdropSection(
+        _ section: [String: Any],
+        sourcePath: String,
+        snapshot: inout ResolvedSettingsSnapshot
+    ) {
+        if section.keys.contains("shaderPath") {
+            if section["shaderPath"] is NSNull {
+                snapshot.managedUserDefaults["backdropShaderPath"] = .nullableString(nil)
+            } else if let value = jsonString(section["shaderPath"]) {
+                snapshot.managedUserDefaults["backdropShaderPath"] = .string(value)
+            } else {
+                logInvalid("backdrop.shaderPath", sourcePath: sourcePath)
+            }
         }
     }
 
