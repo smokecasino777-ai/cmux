@@ -117,9 +117,9 @@ public final class ShaderBackdropNSView: NSView {
         updateDrawableSize()
     }
 
-    deinit {
-        displayLink?.invalidate()
-    }
+    // No deinit invalidation needed: the NSView `displayLink(target:selector:)`
+    // API references its target weakly, and `viewDidMoveToWindow` stops the
+    // link whenever the view leaves a window.
 
     // MARK: Metal setup
 
