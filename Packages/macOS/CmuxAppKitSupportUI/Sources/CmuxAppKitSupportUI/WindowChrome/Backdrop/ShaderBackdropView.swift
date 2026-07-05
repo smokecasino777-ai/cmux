@@ -70,13 +70,18 @@ public final class ShaderBackdropNSView: NSView {
         self.baseColor = baseColor
         self.opacity = opacity
         super.init(frame: .zero)
-        wantsLayer = true
-        layer = metalLayer
         metalLayer.pixelFormat = .bgra8Unorm
         metalLayer.framebufferOnly = true
         metalLayer.isOpaque = false
         metalLayer.backgroundColor = NSColor.clear.cgColor
+        // Layer-hosting via makeBackingLayer(); assigning `.layer` after
+        // `wantsLayer` is silently ignored inside NSHostingView hierarchies.
+        wantsLayer = true
         setUpMetal()
+    }
+
+    override public func makeBackingLayer() -> CALayer {
+        metalLayer
     }
 
     @available(*, unavailable)
@@ -171,8 +176,11 @@ public final class ShaderBackdropNSView: NSView {
         updateStaticUniforms()
         loadedShaderPath = expandedPath
         startTime = CACurrentMediaTime()
+        Self.logger.info("shader backdrop pipeline ready: \(expandedPath, privacy: .public)")
         startDisplayLinkIfNeeded()
     }
+
+    private var loggedFirstFrame = false
 
     /// iChannel0 is a 1×1 texture holding the terminal base color, so
     /// shaders that sample "the terminal" blend over the theme color and
@@ -278,6 +286,11 @@ public final class ShaderBackdropNSView: NSView {
         encoder.endEncoding()
         commandBuffer.present(drawable)
         commandBuffer.commit()
+
+        if !loggedFirstFrame {
+            loggedFirstFrame = true
+            Self.logger.info("shader backdrop first frame: \(Int(self.metalLayer.drawableSize.width))x\(Int(self.metalLayer.drawableSize.height))")
+        }
     }
 
     private static let vertexSource = """
